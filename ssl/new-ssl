@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+
+DOMAIN="laravel.local"
+
+# Config for SSL.
+SSL_DIR="/var/ssl/keys"
+PASSPHRASE="secret"
+SUBJ="
+C=PE
+ST=SomeState
+O=SomeCompany
+localityName=SomeCity
+commonName=*.$DOMAIN
+organizationalUnitName=HQ
+emailAddress=some@email.com
+"
+echo "--- Delete old file .pem ---"
+rm -f "$SSL_DIR/*.pem"
+echo "--- Creating $DOMAIN SSL crt and key ---"
+openssl req -newkey rsa:2048 -new -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -nodes -x509 -days 3650 -keyout "$SSL_DIR/$DOMAIN-key.pem" -out "$SSL_DIR/$DOMAIN-cert.pem" 2>/dev/null
+echo "--- Created SSL ---"
