@@ -5,12 +5,12 @@ from dotenv import load_dotenv
 
 """
 Author: Erick Tucto
-Email: erick.tucto@outlook.com
-Github: https://github.com/ErickTucto
+Email: erick@ericktucto.com
+Github: https://github.com/ericktucto
 Website: https://ericktucto.com
 """
 
-VERSION="dev v2022.04.11"
+VERSION="dev v2023.07.11"
 
 HELP=f"""{VERSION} - por Erick Tucto
 Helper que facilita el uso de los contenedores.
@@ -70,9 +70,10 @@ def status(args):
 
 
 def composer(args):
-    #user = os.getuid()
-    #group = "www-data"
-    run(["docker-compose", "exec", "-u", "www-data", "php"] + args)
+    group = "www-data"
+    user = str(os.getuid()) + ":" + group
+    run(["docker-compose", "exec", "-u", user, "php", "composer"] + args[1:])
+    #chmod g+w app/storage -R
     return 1
 
 
@@ -113,13 +114,12 @@ def main(args):
     }
     RUN_STOP = ORDEN == "start"
     try:
-        funcion = switcher.get(ORDEN, docker)
+        funcion = switcher.get(ORDEN, 'docker')
         return funcion(args)
     except KeyboardInterrupt:
         if RUN_STOP:
             stop([])
         return 1
-
 
 if __name__ == '__main__':
     load_dotenv()
